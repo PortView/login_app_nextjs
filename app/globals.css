@@ -1,0 +1,323 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+    body {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    }
+
+    :root{
+      --val_40: 40px;
+      --val_50: 50px;
+      --val_60: 60px;
+      --val_70: 70px;
+      --val_80: 80px;
+      --val_100: 100px;
+      --val_150: 150px;
+      --val_200: 200px;
+      --val_420: 420px;
+
+      --col_0: 40px;
+      --col_1: 40px;
+      --col_2: 60px;
+      --col_3: 50px;
+      --col_4: 400px;
+      --col_5: 40px;
+      --col_6: 170px;
+      --col_7: 60px;
+      --col_8: 100px;
+      --col_9: 100px;
+      --col_10: 100px;
+
+      --pos-conf_0: 0px; /*0*/
+      --pos-conf_1: var(--col_1); /*40*/
+      --pos-conf_2: calc(var(--pos-conf_1) + var(--col_1)); /*80*/
+      --pos-conf_3: calc(var(--pos-conf_2) + var(--col_2)); /*160*/
+      --pos-conf_4: calc(var(--pos-conf_3) + var(--col_3)); /*210*/
+      --pos-conf_5: calc(var(--pos-conf_4) + var(--col_4)); /*630*/
+      --pos-conf_6: calc(var(--pos-conf_5) + var(--col_5)); /*670*/
+      --pos-conf_7: calc(var(--pos-conf_6) + var(--col_6)); /*820*/
+      --pos-conf_8: calc(var(--pos-conf_7) + var(--col_7)); /*880*/
+      --pos-conf_9: calc(var(--pos-conf_8) + var(--col_8)); /*980*/
+      --pos-conf_10: calc(var(--pos-conf_9) + var(--col_9)); /*1080*/
+    }
+
+ /* Fixed Column Positions 
+    .fixed-pos-0 { left: 0 !important; }
+    .fixed-pos-1 { left: 40px) !important; }
+    .fixed-pos-2 { left: 80px !important; }
+    .fixed-pos-3 { left: 160px !important; }
+    .fixed-pos-4 { left: 210px !important; }
+    .fixed-pos-5 { left: 630px !important; }
+    .fixed-pos-6 { left: 670px !important; }
+    .fixed-pos-7 { left: 820px !important; }
+    .fixed-pos-8 { left: 880px !important; }
+    .fixed-pos-9 { left: 980px !important; }
+    .fixed-pos-10 { left: 1080px !important; }*/
+
+
+
+    .custom-card {
+      border-radius: 1rem;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .dashboard-card {
+      background: white;
+      border-radius: 0.75rem;
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+      transition: all 0.3s ease;
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .spinner {
+      width: 1.5rem;
+      height: 1.5rem;
+      border: 0.25em solid currentColor;
+      border-right-color: transparent;
+    }
+
+    /* Remove all spacing between columns */
+    table {
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 8px;
+      border: 1px solid #dee2e6;
+    }
+
+    /* Ensure fixed columns maintain their styling */
+    th[style*="position: sticky"],
+    td[style*="position: sticky"] {
+      z-index: 2;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      th, td {
+        padding: 6px;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* Reset básico */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Navbar */
+    nav.navbar {
+      width: 100%;
+      background-color: #ffffff;
+      padding: 0.5rem 10px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: 60px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Layout principal */
+    main {
+      padding-top: 80px; /* Aumentado para dar mais espaço após a navbar */
+      width: 100%;
+    }
+
+    /* Container principal */
+    .container {
+      max-width: calc(100vw - 20px);
+      width: 100%;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Table Container */
+    .tab-conform-wrapper {
+      background-color: #1a8aec;
+      border-radius: 12px;
+      padding: 8px;
+      width: 100%;
+      margin-top: 4rem;
+    }
+
+    .tab-conform-container {
+      width: 100%;
+      height: calc(100vh - 280px);
+      overflow-x: auto;
+      overflow-y: auto;
+      position: relative;
+      background-color: #ffffff;
+    }
+
+    .tab-conform {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+      table-layout: fixed;
+      font-size: 0.875rem;
+      background-color: #ffffff;
+    }
+
+    /* Header Styles */
+    .tab-conform thead tr {
+      font-size: 0.75rem;
+    }
+
+    .tab-conform th {
+      position: sticky;
+      top: 0;
+      background-color: #e3f2fd;
+      z-index: 2;
+      white-space: nowrap;
+      font-weight: normal;
+      padding: 0.5rem 0.25rem;
+    }
+
+    /* Fixed Column Styles */
+    .tab-conform th.fixed-column,
+    .tab-conform td.fixed-column {
+      position: sticky;
+    }
+
+    .tab-conform th.fixed-column {
+      z-index: 3;
+      background-color: #e3f2fd;
+    }
+
+    .tab-conform td.fixed-column {
+      z-index: 1;
+    }
+
+    /* Background colors for fixed columns */
+    .tab-conform tbody tr:nth-child(even) td.fixed-column {
+      background-color: #ffffff;
+    }
+
+    .tab-conform tbody tr:nth-child(odd) td.fixed-column {
+      background-color: #f8f9fa;
+    }
+
+    /* Last Fixed Column Shadow */
+    .tab-conform th.fixed-column-last,
+    .tab-conform td.fixed-column-last {
+      box-shadow: 4px 0 6px -2px #888888;
+    }
+
+    /* Background colors for non-fixed columns */
+    .tab-conform tbody tr:nth-child(even) td {
+      background-color: #ffffff;
+    }
+
+    .tab-conform tbody tr:nth-child(odd) td {
+      background-color: #f8f9fa;
+    }
+
+    /* Column Width Classes */
+
+
+    /*.col-xs { width: 40px !important; }
+    .col-sm { width: 60px !important; }
+    .col-md { width: 100px !important; }
+    .col-lg { width: 150px !important; }
+    .col-xl { width: 200px !important; }*/
+    
+    /*.col-w40 { width: 40px }*/
+    .col-w40 { width: var(--val_40) !important; }
+    .col-w50 { width: var(--val_50) !important; }
+    .col-w60 { width: var(--val_60) !important; }
+    .col-w70 { width: var(--val_70) !important; }
+    .col-w80 { width: var(--val_80) !important; }
+    .col-w100 { width: var(--val_100) !important; }
+    .col-w150 { width: var(--val_150) !important; }
+    .col-w200 { width: var(--val_200) !important; }
+    .col-w420 { width: var(--val_420) !important; }
+
+.col-conf_0{ width: var(--col_0) !important; }
+.col-conf_1{ width: var(--col_1) !important; }
+.col-conf_2{ width: var(--col_2) !important; }
+.col-conf_3{ width: var(--col_3) !important; }
+.col-conf_4{ width: var(--col_4) !important; }
+.col-conf_5{ width: var(--col_5) !important; }
+.col-conf_6{ width: var(--col_6) !important; }
+.col-conf_7{ width: var(--col_7) !important; }
+.col-conf_8{ width: var(--col_8) !important; }
+.col-conf_9{ width: var(--col_9) !important; }
+.col-conf_10{ width: var(--col_10) !important; }
+
+
+.fixed-pos-0 { left: var(--pos-conf_0) !important; }
+.fixed-pos-1 { left: var(--pos-conf_1) !important; }
+.fixed-pos-2 { left: var(--pos-conf_2) !important; }
+.fixed-pos-3 { left: var(--pos-conf_3) !important; }
+.fixed-pos-4 { left: var(--pos-conf_4) !important; }
+.fixed-pos-5 { left: var(--pos-conf_5) !important; }
+.fixed-pos-6 { left: var(--pos-conf_6) !important; }
+.fixed-pos-7 { left: var(--pos-conf_7) !important; }
+.fixed-pos-8 { left: var(--pos-conf_8) !important; }
+.fixed-pos-9 { left: var(--pos-conf_9) !important; }
+.fixed-pos-10 { left: var(--pos-conf_10) !important; }
+
+
+
+    /* Fixed Column Positions 
+    .fixed-pos-0 { left: 0 !important; }
+    .fixed-pos-1 { left: var(--val_40) !important; }
+    /*.fixed-pos-2 { left: 80px !important; }
+    .fixed-pos-2 { left: calc(fixed-pos-1 + col-w40) !important; }
+    .fixed-pos-3 { left: 160px !important; }
+    .fixed-pos-4 { left: 210px !important; }
+    .fixed-pos-5 { left: 630px !important; }
+    .fixed-pos-6 { left: 670px !important; }
+    .fixed-pos-7 { left: 820px !important; }
+    .fixed-pos-8 { left: 880px !important; }
+    .fixed-pos-9 { left: 980px !important; }
+    .fixed-pos-10 { left: 1080px !important; }
+    .fixed-pos-10 { left: 1080px !important; }*/
+
+    /* Text Alignment Classes */
+    .text-center {
+      text-align: center;
+    }
+
+    /* Utility Classes */
+    .white-space-normal {
+      white-space: normal;
+    }
+
+    .no-pointer-events {
+      pointer-events: none;
+    }
+
+    /* Colunas não fixas */
+    .tab-conform th.col-periodicidade,
+    .tab-conform td.col-periodicidade {
+      width: 100px !important;
+      min-width: 100px !important;
+      max-width: 100px !important;
+    }
+
+    .tab-conform th.col-atividade,
+    .tab-conform td.col-atividade {
+      width: 100px !important;
+      min-width: 100px !important;
+      max-width: 100px !important;
+    }
+
+    /* Non-fixed columns */
+    .tab-conform .col-periodicidade {
+      width: 100px !important;
+      min-width: 100px !important;
+    }
+
+    .tab-conform .col-atividade {
+      width: 100px !important;
+      min-width: 100px !important;
+    }
