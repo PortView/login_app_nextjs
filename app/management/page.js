@@ -59,9 +59,13 @@ const getUnidades = async (token, codcoor, codcli, uf) => {
     throw new Error('URL da API de unidades não configurada');
   }
 
+  if (!codcoor || !codcli) {
+    throw new Error('codcoor e codcli são obrigatórios');
+  }
+
   const queryParams = new URLSearchParams({
-    codcoor: codcoor.toString(),
-    codcli: codcli.toString(),
+    codcoor: String(codcoor),
+    codcli: String(codcli),
     uf: uf || '',
     page: '1'
   });
@@ -70,8 +74,8 @@ const getUnidades = async (token, codcoor, codcli, uf) => {
   console.log('🚀 Chamando API de unidades:', {
     url,
     params: {
-      codcoor: codcoor.toString(),
-      codcli: codcli.toString(),
+      codcoor: String(codcoor),
+      codcli: String(codcli),
       uf: uf || '',
       page: '1'
     }
@@ -102,6 +106,7 @@ export default function Dashboard() {
   const [selectedUnidade, setSelectedUnidade] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [todasUf, setTodasUf] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -115,10 +120,14 @@ export default function Dashboard() {
 
         // Fetch user data
         const userResponse = await getUserData(token);
-        setUserData(userResponse.data)
+        const userData = {
+          ...userResponse.data,
+          codcoor: userResponse.data.cod // Garantindo que codcoor seja definido
+        };
+        setUserData(userData)
 
         // Fetch clients data using user's cod
-        const clientsResponse = await getClientes(token, userResponse.data.cod);
+        const clientsResponse = await getClientes(token, userData.codcoor);
         // Limpar espaços em branco do campo fantasia
         const cleanedClients = clientsResponse.data.map(client => ({
           ...client,
@@ -166,58 +175,115 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchUnidades = async () => {
       try {
-        if (selectedClient && selectedUf && userData) {
-          const token = localStorage.getItem('access_token');
-          if (!token) return;
+        console.log('Estado atual:', {
+          userData,
+          selectedClient,
+          todasUf,
+          selectedUf,
+          codcoor: userData?.codcoor
+        });
 
-          const response = await getUnidades(
-            token,
-            userData.cod,
-            selectedClient.value,
-            selectedUf
-          );
+        if (userData?.codcoor && selectedClient?.value) {
+          const ufParam = todasUf ? 'ZZ' : selectedUf;
+          console.log('UF param:', ufParam);
 
-          if (response.data && Array.isArray(response.data.folowups)) {
-            const unidadesData = response.data.folowups
-              .filter(item => item && item.cadimov)
-              .map(item => {
-                const tipo = item.cadimov?.tipo?.trim() || '';
-                const nome = item.cadimov?.nome?.trim() || '';
-                const label = tipo && nome ? `${tipo} - ${nome}` : tipo || nome;
-                
-                return {
-                  codend: item.codend,
-                  tipo: label
+          if (todasUf || selectedUf) {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+              console.log('Token não encontrado');
+              return;
+            }
+
+            console.log('Fazendo chamada à API com params:', {
+              codcoor: userData.codcoor,
+              codcli: selectedClient.value,
+              uf: ufParam
+            });
+
+            const response = await getUnidades(
+              token,
+              userData.codcoor,
+              selectedClient.value,
+              ufParam
+            );
+
+            console.log('Resposta completa da API:', response);
+            console.log('Dados da resposta:', response.data);
+            console.log('Folowups:', response.data?.folowups);
+
+            if (response.data?.folowups && Array.isArray(response.data.folowups)) {
+              console.log('Número de folowups:', response.data.folowups.length);
+              
+              const unidadesData = response.data.folowups
+                .filter(item => {
+                  console.log('Item sendo processado:', item);
+                  return item && item.cadimov;
+                })
+                .map(item => {
+                  const tipo = item.cadimov?.tipo?.trim() || '';
+                  const nome = item.cadimov?.nome?.trim() || '';
+                  const uf = item.cadimov?.uf || '';
+                  const label = tipo && nome ? `${tipo} - ${nome}` : tipo || nome;
+                  
+                  console.log('Unidade processada:', {
+                    codend: item.codend,
+                    tipo: label,
+                    uf
+                  });
+
+                  return {
+                    codend: item.codend,
+                    tipo: label,
+                    uf
+                  };
+                });
+              
+              console.log('Unidades processadas final:', unidadesData);
+              setUnidades(unidadesData);
+              
+              if (unidadesData.length > 0) {
+                const primeiraUnidade = {
+                  value: unidadesData[0].codend,
+                  label: unidadesData[0].tipo,
+                  uf: unidadesData[0].uf
                 };
-              });
-            
-            setUnidades(unidadesData);
-            
-            if (unidadesData.length > 0) {
-              setSelectedUnidade({
-                value: unidadesData[0].codend,
-                label: unidadesData[0].tipo
-              });
+                console.log('Selecionando primeira unidade:', primeiraUnidade);
+                setSelectedUnidade(primeiraUnidade);
+              } else {
+                console.log('Nenhuma unidade para selecionar');
+                setSelectedUnidade(null);
+              }
             } else {
+              console.log('Dados inválidos ou vazios da API');
+              setUnidades([]);
               setSelectedUnidade(null);
             }
           } else {
+            console.log('Sem UF selecionada e todasUf false');
             setUnidades([]);
             setSelectedUnidade(null);
           }
         } else {
+          console.log('Faltando dados necessários:', {
+            codcoor: userData?.codcoor,
+            codcli: selectedClient?.value
+          });
           setUnidades([]);
           setSelectedUnidade(null);
         }
       } catch (error) {
-        console.error('Erro ao carregar unidades:', error);
+        console.error('Erro detalhado ao carregar unidades:', {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status
+        });
         setUnidades([]);
         setSelectedUnidade(null);
       }
     };
 
     fetchUnidades();
-  }, [selectedClient, selectedUf, userData]);
+  }, [selectedClient, selectedUf, userData, todasUf]);
 
   const handleLogout = () => {
     localStorage.removeItem('access_token')
@@ -315,7 +381,7 @@ export default function Dashboard() {
                 value: uf,
                 label: uf
               }))}
-              isDisabled={!selectedClient || availableUfs.length === 0}
+              isDisabled={!selectedClient || availableUfs.length === 0 || todasUf}
               placeholder="UF"
               noOptionsMessage={() => "Nenhuma UF disponível"}
               isSearchable={true}
@@ -341,7 +407,19 @@ export default function Dashboard() {
           </div>
 
           <div className="form-check">
-            <input className="form-check-input" type="checkbox" id="todasUf" />
+            <input 
+              className="form-check-input" 
+              type="checkbox" 
+              id="todasUf"
+              checked={todasUf}
+              onChange={(e) => {
+                setTodasUf(e.target.checked);
+                if (e.target.checked) {
+                  // When checked, we'll use 'ZZ' as UF
+                  setSelectedUf(null);
+                }
+              }}
+            />
             <label className="form-check-label" htmlFor="todasUf">
               Todas UF
             </label>
@@ -353,15 +431,16 @@ export default function Dashboard() {
 
         {/* Segunda linha: Unidades */}
         <div className="d-flex align-items-center gap-2 mb-3">
-          <span>Unidades</span>
+          <span>Unidade{selectedUnidade ? ` - ${selectedUnidade.uf}` : todasUf ? ' - Todas UF' : selectedUf ? ` - ${selectedUf}` : ''}</span>
           <Select
             value={selectedUnidade}
             onChange={(option) => setSelectedUnidade(option)}
             options={unidades.map(unidade => ({
               value: unidade.codend,
-              label: unidade.tipo
+              label: unidade.tipo,
+              uf: unidade.uf
             }))}
-            isDisabled={!selectedClient || !selectedUf}
+            isDisabled={!selectedClient || !selectedUf && !todasUf}
             placeholder="Selecione uma unidade"
             noOptionsMessage={() => "Nenhuma unidade disponível"}
             loadingMessage={() => "Carregando..."}

@@ -4,8 +4,11 @@ import axios from 'axios'
 import { useRouter } from 'next/navigation'
 
 export default function Login() {
-  const [email, setEmail] = useState('mauro@ameni.com.br')
-  const [password, setPassword] = useState('$Gbgb')
+  //const [email, setEmail] = useState('mauro@ameni.com.br')
+  //const [password, setPassword] = useState('$Gbgb')
+  const [email, setEmail] = useState('redes01@ameni.com.br')
+  const [password, setPassword] = useState('$Redes01')
+// trocar se necessario
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
